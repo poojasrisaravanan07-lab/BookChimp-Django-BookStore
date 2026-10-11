@@ -1,0 +1,51 @@
+{% extends "store/base.html" %}
+{% block title %}Contact Us — BookChimp{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Get in Touch</h1>
+        <p>Questions, feedback or partnership ideas — we'd love to hear from you.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <div class="contact-info">
+                    <div class="contact-item"><i class="bi bi-geo-alt"></i><div><h6>Visit us</h6><p>24 Lighthouse Lane, Chennai, India</p></div></div>
+                    <div class="contact-item"><i class="bi bi-envelope"></i><div><h6>Email us</h6><p>hello@bookchimp.example</p></div></div>
+                    <div class="contact-item"><i class="bi bi-telephone"></i><div><h6>Call us</h6><p>+91 98765 43210</p></div></div>
+                    <div class="contact-item"><i class="bi bi-clock"></i><div><h6>Store hours</h6><p>Mon–Sat, 10am – 8pm</p></div></div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="checkout-box">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Your name</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email address</label>
+                                <input type="email" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Subject</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Message</label>
+                                <textarea class="form-control" rows="5" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-accent btn-lg mt-4">Send Message <i class="bi bi-send"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "store/base.html" %}
+{% block title %}Checkout — BookChimp{% endblock %}
+{% block content %}
+
+<section class="page-header">
+    <div class="container">
+        <h1>Checkout</h1>
+        <p>This is a demo checkout — no real payment will be processed</p>
+    </div>
+</section>
+
+<section class="section pt-4">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="checkout-box">
+                    <h5><i class="bi bi-truck"></i> Shipping Details</h5>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.full_name.label_tag }}
+                            {{ form.full_name }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.address.label_tag }}
+                            {{ form.address }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.phone.label_tag }}
+                            {{ form.phone }}
+                        </div>
+
+                        <h5 class="mt-4"><i class="bi bi-credit-card"></i> Payment</h5>
+                        <div class="payment-mock">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" checked disabled>
+                                <label class="form-check-label">Cash on Delivery (Demo Mode)</label>
+                            </div>
+                            <p class="small-note mt-2">This project uses a simulated checkout — no card details
+                            are collected and no real transaction takes place.</p>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-lg w-100 mt-4">
+                            Place Order <i class="bi bi-check2-circle"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="order-summary">
+                    <h5>Your Order</h5>
+                    {% for item in cart %}
+                    <div class="summary-item">
+                        <span>{{ item.quantity }} × {{ item.book.title|truncatechars:28 }}</span>
+                        <span>₹{{ item.total_price }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>₹{{ cart.total_price }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

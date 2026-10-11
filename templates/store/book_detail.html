@@ -1,0 +1,122 @@
+{% extends "store/base.html" %}
+{% block title %}{{ book.title }} — BookChimp{% endblock %}
+{% block content %}
+
+<section class="section">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:book_list' %}">Books</a></li>
+                {% if book.category %}<li class="breadcrumb-item"><a href="{{ book.category.get_absolute_url }}">{{ book.category.name }}</a></li>{% endif %}
+                <li class="breadcrumb-item active">{{ book.title }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="detail-cover">
+                    {% if book.cover %}
+                        <img src="{{ book.cover }}" alt="{{ book.title }}">
+                    {% else %}
+                        <div class="cover-placeholder large"><i class="bi bi-book"></i></div>
+                    {% endif %}
+                    {% if book.is_bestseller %}<span class="ribbon ribbon-best">Bestseller</span>{% endif %}
+                    {% if book.is_new_arrival %}<span class="ribbon ribbon-new">New</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <span class="book-category">{{ book.category.name|default:"General" }}</span>
+                <h1 class="detail-title">{{ book.title }}</h1>
+                <p class="detail-author">by <strong>{{ book.author }}</strong></p>
+
+                <div class="book-rating mb-3">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= book.rating %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                    {% endfor %}
+                    <span class="rating-num">{{ book.rating }} / 5</span>
+                    {% if book.pages %}<span class="divider">|</span> {{ book.pages }} pages{% endif %}
+                    {% if book.isbn %}<span class="divider">|</span> ISBN: {{ book.isbn }}{% endif %}
+                </div>
+
+                <div class="detail-price mb-4">
+                    {% if book.has_discount %}
+                        <span class="old-price">₹{{ book.price }}</span>
+                        <span class="badge-save">Save {{ book.discount_percent }}%</span>
+                    {% endif %}
+                    <span class="current-price">₹{{ book.display_price }}</span>
+                </div>
+
+                <!-- AI SUMMARY PANEL -->
+                <div class="ai-summary-panel" id="aiSummaryPanel">
+                    <div class="ai-summary-head">
+                        <i class="bi bi-stars"></i>
+                        <span>AI-Generated Summary</span>
+                        <button type="button" class="btn-refresh-ai" id="refreshAiBtn" title="Regenerate summary">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    <p class="ai-summary-text" id="aiSummaryText">{{ ai_summary }}</p>
+                    <span class="ai-powered-by">Powered by Google Gemini</span>
+                </div>
+
+                <h6 class="mt-4">Description</h6>
+                <p class="detail-description">{{ book.description }}</p>
+
+                <div class="d-flex align-items-center gap-3 mt-4 flex-wrap">
+                    <form action="{% url 'store:cart_add' book.id %}" method="post" class="d-flex align-items-center gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <input type="number" name="quantity" value="1" min="1" max="{{ book.stock }}" class="form-control qty-input" {% if not book.in_stock %}disabled{% endif %}>
+                        <button type="submit" class="btn btn-accent btn-lg" {% if not book.in_stock %}disabled{% endif %}>
+                            <i class="bi bi-basket3-fill"></i> Add to Cart
+                        </button>
+                    </form>
+                    {% if book.in_stock %}
+                        <span class="stock-ok"><i class="bi bi-check-circle-fill"></i> In stock ({{ book.stock }} left)</span>
+                    {% else %}
+                        <span class="stock-out"><i class="bi bi-x-circle-fill"></i> Out of stock</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if related_books %}
+        <div class="section-head mt-5">
+            <div><h2>You might also like</h2></div>
+        </div>
+        <div class="book-grid">
+            {% for related in related_books %}
+                {% include "store/partials/book_card.html" with book=related %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('refreshAiBtn').addEventListener('click', function () {
+    const btn = this;
+    const textEl = document.getElementById('aiSummaryText');
+    btn.classList.add('spinning');
+    fetch("{% url 'store:fetch_ai_summary' book.slug %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: "regenerate=1"
+    })
+    .then(res => res.json())
+    .then(data => {
+        textEl.textContent = data.summary;
+        btn.classList.remove('spinning');
+    })
+    .catch(() => { btn.classList.remove('spinning'); });
+});
+</script>
+{% endblock %}

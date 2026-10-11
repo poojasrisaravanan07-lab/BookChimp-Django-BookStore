@@ -1,0 +1,50 @@
+{% load static %}
+<div class="book-card">
+    <a href="{{ book.get_absolute_url }}" class="book-cover-link">
+        <div class="book-cover">
+            {% if book.cover %}
+                <img src="{{ book.cover }}" alt="{{ book.title }}" loading="lazy">
+            {% else %}
+                <div class="cover-placeholder">
+                    <i class="bi bi-book"></i>
+                    <span>{{ book.title|truncatechars:28 }}</span>
+                </div>
+            {% endif %}
+            {% if book.is_bestseller %}<span class="ribbon ribbon-best">Bestseller</span>{% endif %}
+            {% if book.is_new_arrival %}<span class="ribbon ribbon-new">New</span>{% endif %}
+            {% if book.has_discount %}<span class="ribbon ribbon-sale">-{{ book.discount_percent }}%</span>{% endif %}
+        </div>
+    </a>
+    <div class="book-info">
+        <div class="book-category">{{ book.category.name|default:"General" }}</div>
+        <h3 class="book-title"><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></h3>
+        <p class="book-author">by {{ book.author }}</p>
+        <div class="book-rating">
+            {% for i in "12345" %}
+                {% if forloop.counter <= book.rating %}
+                    <i class="bi bi-star-fill"></i>
+                {% else %}
+                    <i class="bi bi-star"></i>
+                {% endif %}
+            {% endfor %}
+            <span class="rating-num">{{ book.rating }}</span>
+        </div>
+        <div class="book-footer">
+            <div class="book-price">
+                {% if book.has_discount %}
+                    <span class="old-price">₹{{ book.price }}</span>
+                {% endif %}
+                <span class="current-price">₹{{ book.display_price }}</span>
+            </div>
+            <form action="{% url 'store:cart_add' book.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button type="submit" class="btn-add-cart" title="Add to cart" {% if not book.in_stock %}disabled{% endif %}>
+                    <i class="bi bi-basket3-fill"></i>
+                </button>
+            </form>
+        </div>
+        {% if not book.in_stock %}<div class="out-of-stock">Out of stock</div>{% endif %}
+    </div>
+</div>

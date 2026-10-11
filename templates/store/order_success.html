@@ -1,0 +1,32 @@
+{% extends "store/base.html" %}
+{% block title %}Order Confirmed — BookChimp{% endblock %}
+{% block content %}
+
+<section class="section">
+    <div class="container">
+        <div class="success-box">
+            <i class="bi bi-check-circle-fill"></i>
+            <h2>Order Confirmed!</h2>
+            <p>Thanks {{ order.full_name }}, your order <strong>#{{ order.id }}</strong> has been placed successfully.</p>
+            <p class="text-muted">A confirmation would normally be sent to {{ order.email }}. This is a demo
+            checkout, so no real payment has been taken.</p>
+
+            <div class="success-summary">
+                {% for item in order.items.all %}
+                <div class="summary-item">
+                    <span>{{ item.quantity }} × {{ item.book_title }}</span>
+                    <span>₹{{ item.subtotal }}</span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="summary-row total">
+                    <span>Total Paid</span>
+                    <span>₹{{ order.total_amount }}</span>
+                </div>
+            </div>
+
+            <a href="{% url 'store:book_list' %}" class="btn btn-accent btn-lg mt-4">Continue Shopping</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

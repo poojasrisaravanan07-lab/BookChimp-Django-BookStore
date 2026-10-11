@@ -1,0 +1,57 @@
+{% load static %}
+<header class="site-header">
+    <div class="topbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="topbar-msg"><i class="bi bi-truck"></i> Free shipping on orders over ₹999</span>
+            <div class="topbar-links">
+                {% if user.is_authenticated %}
+                    <span class="me-3"><i class="bi bi-person-circle"></i> Hi, {{ user.username }}</span>
+                    <a href="{% url 'store:logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'store:login' %}">Login</a>
+                    <span class="divider">|</span>
+                    <a href="{% url 'store:signup' %}">Sign up</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg main-nav">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'store:home' %}">
+                <span class="brand-mark"><i class="bi bi-bookmark-star-fill"></i></span>
+                <span class="brand-word">Book<em>Chimp</em></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-links">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'store:home' %}">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="{% url 'store:book_list' %}" data-bs-toggle="dropdown">Categories</a>
+                        <ul class="dropdown-menu">
+                            {% for cat in nav_categories %}
+                            <li><a class="dropdown-item" href="{% url 'store:category_detail' cat.slug %}">{{ cat.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'store:book_list' %}?sort=&amp;category=&amp;q=#bestsellers">Best Sellers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'store:about' %}">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'store:contact' %}">Contact</a></li>
+                </ul>
+
+                <form class="d-flex search-form" role="search" action="{% url 'store:book_list' %}" method="get">
+                    <input class="form-control" type="search" name="q" placeholder="Search title or author…" value="{{ request.GET.q }}">
+                    <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+
+                <a href="{% url 'store:cart_detail' %}" class="cart-link ms-3">
+                    <i class="bi bi-basket3"></i>
+                    <span class="cart-badge">{{ cart_total_items|default:0 }}</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+</header>
